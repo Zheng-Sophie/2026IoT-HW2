@@ -4,6 +4,10 @@
 
 ---
 
+Website：https://agnes-iot-hw2.streamlit.app/
+<img width="1350" height="721" alt="image" src="https://github.com/user-attachments/assets/bd66eed1-12ba-4d3d-89b0-98d97812bf9e" />
+
+
 ## 1. 專案介紹（Project Overview）
 
 RegressionLab 是一個以多元線性迴歸（Multiple Linear Regression, MLR）為核心的資料分析平台。
