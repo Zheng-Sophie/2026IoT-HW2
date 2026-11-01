@@ -16,6 +16,14 @@ import seaborn as sns
 PALETTE = "tab10"
 FIG_DPI = 120
 
+plt.rcParams["font.sans-serif"] = [
+    "Microsoft JhengHei",
+    "Noto Sans CJK TC",
+    "SimHei"
+]
+
+plt.rcParams["axes.unicode_minus"] = False
+
 def _new_fig(w=8, h=5):
     fig, ax = plt.subplots(figsize=(w, h), dpi=FIG_DPI)
     fig.patch.set_facecolor("#0f1117")
@@ -38,6 +46,7 @@ def _style_ax(ax):
     for spine in ax.spines.values():
         spine.set_edgecolor("#313244")
     return ax
+
 
 
 # ── 特徵數曲線（並排）────────────────────────────────────────────────────────
@@ -92,7 +101,7 @@ def plot_feature_count_curves(
     ax2.grid(True, color="#313244", alpha=0.5)
     ax2.legend(fontsize=9, facecolor="#1e2030", labelcolor="#cdd6f4")
 
-    fig.suptitle("訓練集 Cross-Validation 結果（非 Test Set）",
+    fig.suptitle("Train set Cross-Validation resule(not Test Set)",
                  fontsize=11, color="#6c7086", y=1.01)
     fig.tight_layout()
     return fig

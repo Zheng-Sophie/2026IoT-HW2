@@ -122,19 +122,28 @@ def render_dataset_panel():
         tab_default, tab_url, tab_upload = st.tabs(
             ["📌 預設資料集", "🔗 自訂 URL", "📤 上傳 CSV"]
         )
+        # ── 首次開啟網站，自動載入預設資料集
+        if st.session_state.get("df") is None:
+            with st.spinner("正在載入預設 Student Performance Factors 資料集..."):
+                df, msg = load_default_dataset()
 
+                if df is not None:
+                    _set_dataset(
+                        df,DEFAULT_DATASET_NAME,"default",msg)
+                else:
+                    st.error(f"預設資料集載入失敗：{msg}")
+                    st.info(get_dataset_load_instructions())
         # ── 預設資料集
         with tab_default:
             st.markdown(f"**{DEFAULT_DATASET_NAME}**")
             st.caption("Kaggle Student Performance Factors 資料集")
-            if st.button("載入預設資料集", key="btn_load_default", type="primary"):
-                with st.spinner("載入中..."):
-                    df, msg = load_default_dataset()
-                    if df is not None:
-                        _set_dataset(df, DEFAULT_DATASET_NAME, "default", msg)
-                    else:
-                        st.error(msg)
-                        st.info(get_dataset_load_instructions())
+
+            if st.session_state.get("df") is not None:
+                st.success("預設資料集已自動載入！")
+                st.dataframe(
+                    st.session_state.df.head(),
+                    use_container_width=True
+                )
 
         # ── 自訂 URL
         with tab_url:

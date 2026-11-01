@@ -53,7 +53,7 @@ def load_default_dataset() -> tuple[pd.DataFrame | None, str]:
     優先使用與 app.py 同目錄的 train.csv。
     若找不到，回傳 None 並附說明。
     """
-    local_path = Path(__file__).parent / DEFAULT_DATASET_LOCAL_FILENAME
+    local_path = Path(__file__).parent / "data" / DEFAULT_DATASET_LOCAL_FILENAME
     if local_path.exists():
         try:
             df = pd.read_csv(local_path)

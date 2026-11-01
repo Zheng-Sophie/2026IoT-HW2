@@ -19,6 +19,7 @@ env/
 # Data files (large CSVs – add manually if needed)
 *.csv
 !sample_data/*.csv
+!data/*.csv
 
 # Jupyter
 .ipynb_checkpoints/

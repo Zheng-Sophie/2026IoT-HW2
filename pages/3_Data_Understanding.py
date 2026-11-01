@@ -67,20 +67,64 @@ if target in df.columns and pd.api.types.is_numeric_dtype(df[target]):
 else:
     st.warning(f"目標欄位 `{target}` 不可用於繪圖。")
 
+
 # ── 6. 相關性熱圖 ─────────────────────────────────────────────────────────────
 st.subheader("6. 特徵相關性熱圖")
-cols_for_corr = [c for c in feat_cols + ([target] if target else []) if c in df.columns]
-if len(cols_for_corr) >= 2:
-    corr = df[cols_for_corr].corr()
-    fig = viz.plot_correlation_heatmap(corr, f"Correlation Heatmap（含目標 {target}）")
+
+cols_for_corr = [
+    c for c in feat_cols + ([target] if target else [])
+    if c in df.columns
+]
+
+# 只保留數值型欄位，避免 Low、Medium、High 等文字造成錯誤
+numeric_cols_for_corr = [
+    c for c in cols_for_corr
+    if pd.api.types.is_numeric_dtype(df[c])
+]
+
+if len(numeric_cols_for_corr) >= 2:
+    corr = df[numeric_cols_for_corr].corr()
+
+    fig = viz.plot_correlation_heatmap(
+        corr,
+        f"Correlation Heatmap({target})"
+    )
     st.pyplot(fig, use_container_width=True)
 
-    st.markdown("**與目標變數相關係數（Top 15）**")
-    if target in corr.columns:
-        corr_target = corr[target].drop(target, errors="ignore").abs().sort_values(ascending=False).head(15)
-        st.dataframe(corr_target.reset_index().rename(columns={"index": "特徵", target: "| 相關係數 |"}), use_container_width=True)
+    st.markdown("**與目標變數相關係數(Top 15)**")
+
+    if target and target in corr.columns:
+        corr_target = (
+            corr[target]
+            .drop(target, errors="ignore")
+            .abs()
+            .sort_values(ascending=False)
+            .head(15)
+        )
+
+        if not corr_target.empty:
+            result = corr_target.reset_index()
+            result.columns = ["特徵", "| 相關係數 |"]
+            st.dataframe(result, use_container_width=True)
+        else:
+            st.info("沒有可顯示的特徵相關係數。")
+
+    elif target and target in df.columns:
+        st.info(
+            f"目標變數「{target}」不是數值型欄位，"
+            "因此無法直接計算 Pearson 相關係數。"
+        )
+
 else:
-    st.info("特徵數量不足，無法繪製相關性熱圖。")
+    st.info("可用的數值欄位不足 2 個，無法繪製相關性熱圖。")
+
+    if target and target in df.columns:
+        if not pd.api.types.is_numeric_dtype(df[target]):
+            st.caption(
+                f"目前目標變數「{target}」為類別或文字資料，"
+                "本圖僅支援數值型欄位。"
+            )
+
 
 # ── 7. 可能的異常值 ───────────────────────────────────────────────────────────
 st.subheader("7. 可能的異常值（IQR 方法）")

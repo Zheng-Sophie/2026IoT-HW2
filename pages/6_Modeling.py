@@ -67,9 +67,11 @@ if btn_train:
     selected_feats = sel_result.selected_features
     st.info(f"選中特徵（{len(selected_feats)}）：{', '.join(selected_feats)}")
 
+    X_train_selected = X_train[selected_feats].copy()
+
     with st.spinner(f"訓練 {MODEL_NAMES[model_key]} ..."):
-        pipeline, info = fit_model(model_key, selected_feats, X_train, y_train, seed)
-        cv_info = cv_evaluate_model(model_key, selected_feats, X_train, y_train, CV_FOLDS, seed)
+        pipeline, info = fit_model(model_key, selected_feats, X_train_selected, y_train, seed)
+        cv_info = cv_evaluate_model(model_key, selected_feats, X_train_selected, y_train, CV_FOLDS, seed)
 
     model_label = f"{MODEL_NAMES[model_key]} | {FEATURE_SELECTION_METHODS[method_key]} | k={len(selected_feats)}"
     model_state_key = f"{model_key}_{method_key}_{len(selected_feats)}"
@@ -93,7 +95,7 @@ if btn_train:
         "feature_names": selected_feats,
         "model_type": model_key,
         "model_label": model_label,
-        "X_train": X_train,
+        "X_train": X_train_selected,
         "y_train": y_train,
     }
     st.success(f"✅ 訓練完成！CV RMSE={cv_info['cv_rmse_mean']:.6f}，CV R²={cv_info['cv_r2_mean']:.6f}")

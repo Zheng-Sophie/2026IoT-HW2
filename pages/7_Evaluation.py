@@ -53,18 +53,30 @@ if eval_btn and sel_key:
     feat_names = model_info["selected_features"]
     model_key = model_info["model_key"]
 
+    # 確認測試資料包含所有模型特徵
+    missing_features = [
+        f for f in feat_names
+        if f not in X_test.columns
+    ]
+
+    if missing_features:
+        st.error(f"測試資料缺少模型特徵：{missing_features}")
+        st.stop()
+
+    # 依照模型訓練時的特徵順序建立測試資料
+    X_test_selected = X_test.reindex(columns=feat_names)
     with st.spinner("計算測試集指標..."):
-        test_eval = evaluate_on_test(pipeline, X_test, y_test, len(feat_names))
+        test_eval = evaluate_on_test(pipeline, X_test_selected, y_test, len(feat_names))
 
     with st.spinner("執行回歸假設診斷..."):
         diag = run_all_diagnostics(
-            pipeline, X_train, y_train, X_test, y_test,
+            pipeline, X_train.reindex(columns=feat_names), y_train, X_test_selected, y_test,
             feat_names, model_key
         )
 
     with st.spinner("計算 95% 預測區間..."):
         pi_info = compute_prediction_interval(
-            pipeline, X_train, y_train, X_test[feat_names],
+            pipeline, X_train.reindex(columns=feat_names), y_train, X_test_selected,
             feat_names, model_key
         )
 
